@@ -1,8 +1,10 @@
-from fastapi import APIRouter, HTTPException
-from app.schemas.livro import LivroSchema
+from fastapi import APIRouter, HTTPException, Depends
+from app.schemas.livro import LivroResponse, LivroSchema
 from app.database.connection import SessionLocal
 from app.database.models import LivroModel
 from app.schemas.livro import LivroCreate
+
+from sqlalchemy.orm  import Session
 
 from app.database.connection import get_db
 from app.services import livro_service
@@ -20,7 +22,7 @@ async def listar_livros(
   return livro_service.listar_livros(db)
  
 #Adicionar Livros
-@router.post("/")
+@router.post("/" , response_model=LivroResponse)
 async def adicionar_livro(
     livro: LivroCreate,
     db:Session = Depends(get_db)
@@ -28,7 +30,7 @@ async def adicionar_livro(
     return livro_service.adicionar_livro(livro, db)
     
 #atualizar-livro
-@router.put("/{index}")
+@router.put("/{index}", response_model=LivroResponse)
 async def atualizar_livro(
     index: int, 
     livro: LivroCreate,
@@ -43,7 +45,7 @@ async def atualizar_livro(
     return livro_db
 
 #delete-livro
-@router.delete("/{index}")
+@router.delete("/{index}", response_model=LivroResponse)
 async def deletar_livro(
     index: int,
     db:Session = Depends(get_db)
